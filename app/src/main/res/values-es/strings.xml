@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">App de platos</string>
+    <string name="category_list">Lista de categorías</string>
+    <string name="meal_list">Lista de platos %1$s</string>
+</resources>

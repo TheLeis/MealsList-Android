@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">MealsList-Android</string>
+    <string name="app_name">Meals App</string>
+    <string name="category_list">Category list</string>
+    <string name="meal_list">List of %1$s meals</string>
 </resources>
