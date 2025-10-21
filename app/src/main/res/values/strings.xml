@@ -1,5 +1,11 @@
 <resources>
     <string name="app_name">Meals App</string>
     <string name="category_list">Category list</string>
-    <string name="meal_list">List of %1$s meals</string>
+    <string name="category_and_area">%1$s / %2$s</string>
+    <string name="meal_list_by_category">List of %1$s meals</string>
+    <string name="error_no_internet">Internet connection not available.</string>
+    <string name="error_generic">An unexpected error occurred.</string>
+    <string name="ingredients">Ingredients</string>
+    <string name="instructions">Instructions</string>
+    <string name="share">Share</string>
 </resources>

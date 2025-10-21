@@ -10,6 +10,12 @@ interface MealService {
     @GET("categories.php")
     suspend fun getAllCategories(): Categories
 
+    @GET("filter.php")
+    suspend fun getMealsByCategory(@Query("c") category: String): Meals
+
+    @GET("lookup.php")
+    suspend fun getMealById(@Query("i") id: Int): MealDescription
+
     companion object {
         fun getInstance(): MealService {
             val retrofit = Retrofit.Builder()
