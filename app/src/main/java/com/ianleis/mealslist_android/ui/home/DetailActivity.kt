@@ -1,16 +1,25 @@
 package com.ianleis.mealslist_android.ui.home
 
+import GalleryAdapter
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import coil3.load
 import com.ianleis.mealslist_android.R
 import com.ianleis.mealslist_android.data.network.MealData
 import com.ianleis.mealslist_android.data.network.MealService
+import com.ianleis.mealslist_android.data.network.getIngredients
 import com.ianleis.mealslist_android.databinding.ActivityDetailBinding
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -37,16 +46,46 @@ class DetailActivity : AppCompatActivity() {
             insets
         }
         val mealID = intent.getIntExtra(EXTRA_MEAL_ID, -1)
-        getGame(mealID)
+        lifecycle.addObserver(binding.youtubePlayerView)
+        getMeal(mealID)
     }
 
     fun loadData() {
+        // Text info
         binding.titleTextView.text = meal.strMeal
         binding.categoryChip.text = getString(R.string.category_and_area, meal.strCategory, meal.strArea)
         binding.textInstructions.text = meal.strInstructions
+        // Meal image
+        binding.mealImage.load(meal.strMealThumb)
+        // Recipe video
+        binding.youtubePlayerView.addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
+            override fun onReady(youTubePlayer: YouTubePlayer) {
+                meal.strYoutube?.let {
+                    if (it.isNotEmpty()) {
+                        val videoId = it.substringAfter("v=").substringBefore("&")
+                        youTubePlayer.cueVideo(videoId, 0f)
+                    } else {
+                        binding.youtubeFrame.visibility = View.GONE
+                    }
+                }
+            }
+        })
+        // Ingredients
+        val adapter = GalleryAdapter(meal.getIngredients())
+        binding.ingredientsRecyclerView.adapter = adapter
+        binding.ingredientsRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        // Share button
+        binding.shareButton.setOnClickListener {
+            val sendIntent = Intent()
+            sendIntent.setAction(Intent.ACTION_SEND)
+            sendIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_text, meal.strMeal, meal.idMeal.toString()))
+            sendIntent.setType("text/plain")
+            val shareIntent = Intent.createChooser(sendIntent, null)
+            startActivity(shareIntent)
+        }
     }
 
-    fun getGame(id: Int) {
+    fun getMeal(id: Int) {
         lifecycleScope.launch {
             try {
                 val service = withContext(Dispatchers.IO) {
@@ -59,10 +98,19 @@ class DetailActivity : AppCompatActivity() {
             } catch (e: IOException) {
                 // Handles IO exceptions, like network errors
                 Log.e("DetailActivity", "Error fetching meal: ${e.message}")
+                showError(getString(R.string.error_no_internet))
             } catch (e: Exception) {
                 // Handles other exceptions
                 Log.e("DetailActivity", "Error fetching meal: ${e.message}")
+                showError(getString(R.string.error_generic))
             }
         }
+    }
+
+    private fun showError(message: String) {
+        binding.scrollView.isVisible = false
+        binding.shareButton.isVisible = false
+        binding.textError.visibility = View.VISIBLE
+        binding.textError.text = message
     }
 }

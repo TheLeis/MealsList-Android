@@ -3,9 +3,12 @@ package com.ianleis.mealslist_android.ui.home
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
@@ -30,7 +33,8 @@ class MealsCategoryActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMealsCategoryBinding
     lateinit var adapter : MealAdapter
-    var mealList: List<MealItem> = emptyList()
+    var filteredMealList: List<MealItem> = emptyList()
+    var originalMealList: List<MealItem> = emptyList()
     lateinit var categoryName : String
 
 
@@ -45,12 +49,47 @@ class MealsCategoryActivity : AppCompatActivity() {
             insets
         }
         categoryName = intent.getStringExtra(EXTRA_CATEGORY_NAME)!!
-        adapter = MealAdapter(mealList)
+        adapter = MealAdapter(filteredMealList)
             { id -> onItemSelected(id) }
         binding.mealList.adapter = adapter
         binding.mealList.layoutManager = GridLayoutManager(this, 1)
         getMealList()
         binding.textCategoryMeal.text = getString(R.string.meal_list_by_category, categoryName)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.appbar_menu, menu)
+
+        val searchView = menu.findItem(R.id.action_search).actionView as SearchView
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                binding.textError.visibility = View.GONE
+                filteredMealList = originalMealList.filter { it.strMeal.contains(newText, true) }
+                adapter.updateItems(filteredMealList)
+                if (filteredMealList.isEmpty()) {
+                    showError(getString(R.string.error_no_results))
+                }
+                return true
+            }
+        })
+
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_settings -> {
+                val intent = Intent(this, SettingsActivity::class.java)
+                startActivity(intent)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     fun onItemSelected(mealID: Int) {
@@ -66,9 +105,10 @@ class MealsCategoryActivity : AppCompatActivity() {
                 val service = withContext(Dispatchers.IO) {
                     MealService.getInstance()
                 }
-                mealList = service.getMealsByCategory(categoryName).meals
+                originalMealList = service.getMealsByCategory(categoryName).meals
+                filteredMealList = originalMealList
                 CoroutineScope(Dispatchers.Main).launch {
-                    adapter.updateItems(mealList)
+                    adapter.updateItems(filteredMealList)
                 }
                 binding.progressBar.isVisible = false
             } catch (e: IOException) {

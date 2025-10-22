@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">App de platos</string>
+    <string name="menu_search">Buscar</string>
+    <string name="menu_favorites">Favoritos</string>
+    <string name="menu_settings">Ajustes</string>
+    <string name="dark_mode">Modo oscuro</string>
     <string name="category_list">Lista de categorías</string>
-    <string name="category_and_area">%1$s / %2$s</string>
     <string name="meal_list_by_category">Lista de platos %1$s</string>
+    <string name="error_no_results">No se encontraron resultados.</string>
     <string name="error_no_internet">No hay conexión a internet.</string>
     <string name="error_generic">Ha ocurrido un error inesperado.</string>
     <string name="ingredients">Ingredientes</string>
     <string name="instructions">Instrucciones</string>
     <string name="share">Compartir</string>
+    <string name="share_text">Mira ésta receta de %1$s: https://www.themealdb.com/meal/%2$s</string>
 </resources>

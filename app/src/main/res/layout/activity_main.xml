@@ -38,8 +38,7 @@
         android:gravity="center"
         android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/textCategoryList"
-        android:textSize="24sp"
-        />
+        android:textSize="20sp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/categoryList"

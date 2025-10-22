@@ -21,7 +21,8 @@
                 android:id="@+id/thumbnailImageView"
                 android:layout_width="match_parent"
                 android:layout_height="240dp"
-                tools:src="@drawable/ic_launcher_background"
+                android:importantForAccessibility="no"
+                tools:src="@drawable/bg_image_placeholder"
                 android:scaleType="centerCrop"/>
 
             <LinearLayout

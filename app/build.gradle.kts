@@ -51,6 +51,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.datastore.core)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -65,4 +66,7 @@ dependencies {
 
     // Youtube dependency
     implementation(libs.youtube.player)
+
+    // Datastore dependency
+    implementation(libs.androidx.datastore.preferences)
 }
