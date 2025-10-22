@@ -19,8 +19,8 @@ data class MealFavorite (
 
         const val SQL_CREATE_TABLE =
             "CREATE TABLE $TABLE_NAME (" +
-                    "$COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    "${COLUMN_STRMEAL }TEXT)" +
+                    "$COLUMN_ID INTEGER," +
+                    "${COLUMN_STRMEAL }TEXT," +
                     "${COLUMN_STRCATEGORY}TEXT," +
                     "${COLUMN_STRMEALTHUMB}BLOB," +
                     "${COLUMN_STRAREA}TEXT," +
