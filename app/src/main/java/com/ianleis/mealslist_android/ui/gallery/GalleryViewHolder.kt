@@ -17,6 +17,7 @@ class GalleryViewHolder(val binding: ItemGalleryBinding) : RecyclerView.ViewHold
             crossfade(true)
 
         }
-        binding.ingredientTextView.text = binding.root.context.getString(R.string.measure_and_name, ingredientItem.measure, ingredientItem.name)
+        binding.ingredientTextView.text = binding.root.context.getString(R.string.measure_and_name,
+            ingredientItem.measure.replaceFirstChar { it.uppercase() }, ingredientItem.name)
     }
 }

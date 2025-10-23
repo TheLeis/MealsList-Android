@@ -1,7 +1,6 @@
 package com.ianleis.mealslist_android.ui.home
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -54,26 +53,26 @@ class FavoriteDetailActivity : AppCompatActivity() {
 
     private fun getIngredients(meal: MealFavorite): String {
         val ingredients = mutableListOf<String>()
-        if (!meal.strIngredient1.isNullOrBlank()) ingredients.add("${meal.strMeasure1} ${meal.strIngredient1}")
-        if (!meal.strIngredient2.isNullOrBlank()) ingredients.add("${meal.strMeasure2} ${meal.strIngredient2}")
-        if (!meal.strIngredient3.isNullOrBlank()) ingredients.add("${meal.strMeasure3} ${meal.strIngredient3}")
-        if (!meal.strIngredient4.isNullOrBlank()) ingredients.add("${meal.strMeasure4} ${meal.strIngredient4}")
-        if (!meal.strIngredient5.isNullOrBlank()) ingredients.add("${meal.strMeasure5} ${meal.strIngredient5}")
-        if (!meal.strIngredient6.isNullOrBlank()) ingredients.add("${meal.strMeasure6} ${meal.strIngredient6}")
-        if (!meal.strIngredient7.isNullOrBlank()) ingredients.add("${meal.strMeasure7} ${meal.strIngredient7}")
-        if (!meal.strIngredient8.isNullOrBlank()) ingredients.add("${meal.strMeasure8} ${meal.strIngredient8}")
-        if (!meal.strIngredient9.isNullOrBlank()) ingredients.add("${meal.strMeasure9} ${meal.strIngredient9}")
-        if (!meal.strIngredient10.isNullOrBlank()) ingredients.add("${meal.strMeasure10} ${meal.strIngredient10}")
-        if (!meal.strIngredient11.isNullOrBlank()) ingredients.add("${meal.strMeasure11} ${meal.strIngredient11}")
-        if (!meal.strIngredient12.isNullOrBlank()) ingredients.add("${meal.strMeasure12} ${meal.strIngredient12}")
-        if (!meal.strIngredient13.isNullOrBlank()) ingredients.add("${meal.strMeasure13} ${meal.strIngredient13}")
-        if (!meal.strIngredient14.isNullOrBlank()) ingredients.add("${meal.strMeasure14} ${meal.strIngredient14}")
-        if (!meal.strIngredient15.isNullOrBlank()) ingredients.add("${meal.strMeasure15} ${meal.strIngredient15}")
-        if (!meal.strIngredient16.isNullOrBlank()) ingredients.add("${meal.strMeasure16} ${meal.strIngredient16}")
-        if (!meal.strIngredient17.isNullOrBlank()) ingredients.add("${meal.strMeasure17} ${meal.strIngredient17}")
-        if (!meal.strIngredient18.isNullOrBlank()) ingredients.add("${meal.strMeasure18} ${meal.strIngredient18}")
-        if (!meal.strIngredient19.isNullOrBlank()) ingredients.add("${meal.strMeasure19} ${meal.strIngredient19}")
-        if (!meal.strIngredient20.isNullOrBlank()) ingredients.add("${meal.strMeasure20} ${meal.strIngredient20}")
+        if (!meal.strIngredient1.isNullOrBlank()) ingredients.add("${meal.strMeasure1?.replaceFirstChar(Char::uppercase)} ${meal.strIngredient1}")
+        if (!meal.strIngredient2.isNullOrBlank()) ingredients.add("${meal.strMeasure2?.replaceFirstChar(Char::uppercase)} ${meal.strIngredient2}")
+        if (!meal.strIngredient3.isNullOrBlank()) ingredients.add("${meal.strMeasure3?.replaceFirstChar(Char::uppercase)} ${meal.strIngredient3}")
+        if (!meal.strIngredient4.isNullOrBlank()) ingredients.add("${meal.strMeasure4?.replaceFirstChar(Char::uppercase)} ${meal.strIngredient4}")
+        if (!meal.strIngredient5.isNullOrBlank()) ingredients.add("${meal.strMeasure5?.replaceFirstChar(Char::uppercase)} ${meal.strIngredient5}")
+        if (!meal.strIngredient6.isNullOrBlank()) ingredients.add("${meal.strMeasure6?.replaceFirstChar(Char::uppercase)} ${meal.strIngredient6}")
+        if (!meal.strIngredient7.isNullOrBlank()) ingredients.add("${meal.strMeasure7?.replaceFirstChar(Char::uppercase)} ${meal.strIngredient7}")
+        if (!meal.strIngredient8.isNullOrBlank()) ingredients.add("${meal.strMeasure8?.replaceFirstChar(Char::uppercase)} ${meal.strIngredient8}")
+        if (!meal.strIngredient9.isNullOrBlank()) ingredients.add("${meal.strMeasure9?.replaceFirstChar(Char::uppercase)} ${meal.strIngredient9}")
+        if (!meal.strIngredient10.isNullOrBlank()) ingredients.add("${meal.strMeasure10?.replaceFirstChar(Char::uppercase)} ${meal.strIngredient10}")
+        if (!meal.strIngredient11.isNullOrBlank()) ingredients.add("${meal.strMeasure11?.replaceFirstChar(Char::uppercase)} ${meal.strIngredient11}")
+        if (!meal.strIngredient12.isNullOrBlank()) ingredients.add("${meal.strMeasure12?.replaceFirstChar(Char::uppercase)} ${meal.strIngredient12}")
+        if (!meal.strIngredient13.isNullOrBlank()) ingredients.add("${meal.strMeasure13?.replaceFirstChar(Char::uppercase)} ${meal.strIngredient13}")
+        if (!meal.strIngredient14.isNullOrBlank()) ingredients.add("${meal.strMeasure14?.replaceFirstChar(Char::uppercase)} ${meal.strIngredient14}")
+        if (!meal.strIngredient15.isNullOrBlank()) ingredients.add("${meal.strMeasure15?.replaceFirstChar(Char::uppercase)} ${meal.strIngredient15}")
+        if (!meal.strIngredient16.isNullOrBlank()) ingredients.add("${meal.strMeasure16?.replaceFirstChar(Char::uppercase)} ${meal.strIngredient16}")
+        if (!meal.strIngredient17.isNullOrBlank()) ingredients.add("${meal.strMeasure17?.replaceFirstChar(Char::uppercase)} ${meal.strIngredient17}")
+        if (!meal.strIngredient18.isNullOrBlank()) ingredients.add("${meal.strMeasure18?.replaceFirstChar(Char::uppercase)} ${meal.strIngredient18}")
+        if (!meal.strIngredient19.isNullOrBlank()) ingredients.add("${meal.strMeasure19?.replaceFirstChar(Char::uppercase)} ${meal.strIngredient19}")
+        if (!meal.strIngredient20.isNullOrBlank()) ingredients.add("${meal.strMeasure20?.replaceFirstChar(Char::uppercase)} ${meal.strIngredient20}")
         return ingredients.joinToString("\n")
     }
 
