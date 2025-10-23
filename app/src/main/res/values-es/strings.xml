@@ -7,8 +7,12 @@
     <string name="dark_mode">Modo oscuro</string>
     <string name="category_list">Lista de categorías</string>
     <string name="meal_list_by_category">Lista de platos %1$s</string>
+    <string name="meal_list_favorites">Lista de platos favoritos</string>
+    <string name="meal_removed_from_favorites">%1$s eliminado de favoritos.</string>
     <string name="error_no_results">No se encontraron resultados.</string>
-    <string name="error_no_internet">No hay conexión a internet.</string>
+    <string name="error_no_internet">No hay conexión a internet.\nTodavía puedes ver tus platos favoritos.</string>
+    <string name="error_no_internet_favorite">Se necesita conexión a internet para añadir un plato a favoritos.</string>
+    <string name="error_no_favorites">No tienes platos favoritos.</string>
     <string name="error_generic">Ha ocurrido un error inesperado.</string>
     <string name="ingredients">Ingredientes</string>
     <string name="instructions">Instrucciones</string>

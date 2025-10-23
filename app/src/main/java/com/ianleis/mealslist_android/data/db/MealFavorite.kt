@@ -1,30 +1,41 @@
 package com.ianleis.mealslist_android.data.db
 
+import com.ianleis.mealslist_android.data.network.MealData
+
 data class MealFavorite (
     val id: Int,
     val strMeal: String,
     val strCategory: String,
-    val strMealThumb: ByteArray,
     val strArea: String,
     val strInstructions: String,
+    val strMealThumb: ByteArray
 ) {
+    constructor(mealData: MealData, mealThumb: ByteArray) : this(
+        id = mealData.idMeal,
+        strMeal = mealData.strMeal,
+        strCategory = mealData.strCategory,
+        strArea = mealData.strArea,
+        strInstructions = mealData.strInstructions,
+        strMealThumb = mealThumb
+    )
+
     companion object {
         const val TABLE_NAME = "MealFavorite"
         const val COLUMN_ID = "id"
         const val COLUMN_STRMEAL = "strMeal"
         const val COLUMN_STRCATEGORY = "strCategory"
-        const val COLUMN_STRMEALTHUMB = "strMealThumb"
         const val COLUMN_STRAREA = "strArea"
         const val COLUMN_STRINSTRUCTIONS = "strInstructions"
+        const val COLUMN_STRMEALTHUMB = "strMealThumb"
 
         const val SQL_CREATE_TABLE =
             "CREATE TABLE $TABLE_NAME (" +
-                    "$COLUMN_ID INTEGER," +
-                    "${COLUMN_STRMEAL }TEXT," +
-                    "${COLUMN_STRCATEGORY}TEXT," +
-                    "${COLUMN_STRMEALTHUMB}BLOB," +
-                    "${COLUMN_STRAREA}TEXT," +
-                    "${COLUMN_STRINSTRUCTIONS}TEXT)"
+                    "$COLUMN_ID INTEGER UNIQUE," +
+                    "$COLUMN_STRMEAL TEXT," +
+                    "$COLUMN_STRCATEGORY TEXT," +
+                    "$COLUMN_STRAREA TEXT," +
+                    "$COLUMN_STRINSTRUCTIONS TEXT," +
+                    "$COLUMN_STRMEALTHUMB BLOB)"
 
         const val SQL_DROP_TABLE = "DROP TABLE IF EXISTS $TABLE_NAME"
     }

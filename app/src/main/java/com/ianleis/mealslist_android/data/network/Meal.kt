@@ -16,6 +16,32 @@ data class MealItem (
     @SerializedName("strMealThumb") val strMealThumb: String
 )
 
+data class MealItemFavorite (
+    @SerializedName("idMeal") val idMeal: Int,
+    @SerializedName("strMeal") val strMeal: String,
+    @SerializedName("strMealThumb") val strMealThumb: ByteArray
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as MealItemFavorite
+
+        if (idMeal != other.idMeal) return false
+        if (strMeal != other.strMeal) return false
+        if (!strMealThumb.contentEquals(other.strMealThumb)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = idMeal
+        result = 31 * result + strMeal.hashCode()
+        result = 31 * result + strMealThumb.contentHashCode()
+        return result
+    }
+}
+
 data class MealData (
     @SerializedName("idMeal") val idMeal: Int,
     @SerializedName("strMeal") val strMeal: String,

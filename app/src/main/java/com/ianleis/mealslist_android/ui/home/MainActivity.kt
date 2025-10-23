@@ -33,26 +33,24 @@ import java.io.IOException
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    lateinit var adapter : CategoryAdapter
-    var filteredCategoryList: List<Category> = emptyList()
-    var originalCategoryList: List<Category> = emptyList()
+    private lateinit var adapter : CategoryAdapter
+    private var filteredCategoryList: List<Category> = emptyList()
+    private var originalCategoryList: List<Category> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.main)
-
+        // Set app to dark mode if the user has selected it in the settings
         lifecycleScope.launch {
             val isDarkMode = dataStore.data.map { preferences ->
                 preferences[SettingsKeys.DARK_MODE_KEY] ?: false
             }.first()
-            Log.i("isDarkMode", isDarkMode.toString())
             if (isDarkMode) AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
             else AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
             delegate.applyDayNight()
         }
-
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -67,9 +65,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.appbar_menu, menu)
-
         val searchView = menu.findItem(R.id.action_search).actionView as SearchView
-
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
                 return false
@@ -96,13 +92,18 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
                 true
             }
+            R.id.action_favorites -> {
+                val intent = Intent(this, FavoritesActivity::class.java)
+                startActivity(intent)
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
 
     fun onItemSelected(categoryName: String) {
-        val intent = Intent(this, MealsCategoryActivity::class.java)
-        intent.putExtra(MealsCategoryActivity.EXTRA_CATEGORY_NAME, categoryName)
+        val intent = Intent(this, MealsListActivity::class.java)
+        intent.putExtra(MealsListActivity.EXTRA_CATEGORY_NAME, categoryName)
         startActivity(intent)
     }
 

@@ -8,8 +8,12 @@
     <string name="category_and_area" translatable="false">%1$s / %2$s</string>
     <string name="measure_and_name" translatable="false">%1$s %2$s</string>
     <string name="meal_list_by_category">List of %1$s meals</string>
+    <string name="meal_list_favorites">List of favorite meals</string>
+    <string name="meal_removed_from_favorites">%1$s removed from favorites.</string>
     <string name="error_no_results">No results found.</string>
-    <string name="error_no_internet">Internet connection not available.</string>
+    <string name="error_no_favorites">No favorite meals found.</string>
+    <string name="error_no_internet">Internet connection not available.\nYou can still view your favorite meals.</string>
+    <string name="error_no_internet_favorite">You need an internet connection to add favorite meals.</string>
     <string name="error_generic">An unexpected error occurred.</string>
     <string name="ingredients">Ingredients</string>
     <string name="instructions">Instructions</string>

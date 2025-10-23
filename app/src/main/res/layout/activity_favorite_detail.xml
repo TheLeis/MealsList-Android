@@ -11,6 +11,7 @@
         android:id="@+id/textError"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:textSize="20sp"
         android:visibility="gone"
         app:layout_constraintTop_toTopOf="parent" />
@@ -28,18 +29,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-
-            <FrameLayout
-                android:id="@+id/youtubeFrame"
-                android:layout_width="match_parent"
-                android:layout_height="240dp">
-
-                <com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
-                    android:id="@+id/youtubePlayerView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-            </FrameLayout>
 
             <!-- Header -->
 
@@ -79,17 +68,6 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/favoriteButton"
-                        style="?attr/materialIconButtonFilledStyle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"
-                        app:icon="@drawable/ic_favorite_outline"
-                        app:iconTint="@color/white"/>
-
 
                 </LinearLayout>
 
@@ -176,18 +154,5 @@
         </LinearLayout>
 
     </ScrollView>
-
-    <!-- Buttons -->
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        style="?attr/floatingActionButtonStyle"
-        android:id="@+id/shareButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:contentDescription="@string/share"
-        app:srcCompat="@drawable/ic_share"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

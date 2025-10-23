@@ -1,51 +1,54 @@
 package com.ianleis.mealslist_android.ui.home
 
-import GalleryAdapter
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
-import coil3.load
+import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.ianleis.mealslist_android.R
-import com.ianleis.mealslist_android.data.db.MealFavorite
 import com.ianleis.mealslist_android.data.db.MealFavoriteDAO
+import com.ianleis.mealslist_android.data.db.MealFavorite
 import com.ianleis.mealslist_android.data.network.MealData
+import com.ianleis.mealslist_android.data.network.MealItem
 import com.ianleis.mealslist_android.data.network.MealService
-import com.ianleis.mealslist_android.data.network.getIngredients
-import com.ianleis.mealslist_android.databinding.ActivityDetailBinding
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
-import kotlinx.coroutines.CoroutineScope
+import com.ianleis.mealslist_android.databinding.ActivityMealsListBinding
+import com.ianleis.mealslist_android.ui.meal.MealAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.net.URL
 
-class DetailActivity : AppCompatActivity() {
+class MealsListActivity : AppCompatActivity() {
 
     companion object {
-        const val EXTRA_MEAL_ID = "MEAL_ID"
+        const val EXTRA_CATEGORY_NAME = "CATEGORY_NAME"
     }
 
-    private lateinit var binding: ActivityDetailBinding
-    private lateinit var meal: MealData
+    private lateinit var binding: ActivityMealsListBinding
+    private lateinit var adapter : MealAdapter
+    private var filteredMealList: List<MealItem> = emptyList()
+    private var originalMealList: List<MealItem> = emptyList()
+    private lateinit var categoryName : String
     private lateinit var mealFavoriteDAO: MealFavoriteDAO
     private var bottomInset: Int = 0
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        binding = ActivityDetailBinding.inflate(layoutInflater)
+        binding = ActivityMealsListBinding.inflate(layoutInflater)
         setContentView(binding.main)
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -54,75 +57,86 @@ class DetailActivity : AppCompatActivity() {
             insets
         }
         mealFavoriteDAO = MealFavoriteDAO(this)
-        val mealID = intent.getIntExtra(EXTRA_MEAL_ID, -1)
-        lifecycle.addObserver(binding.youtubePlayerView)
-        getMeal(mealID)
+        categoryName = intent.getStringExtra(EXTRA_CATEGORY_NAME)!!
+        adapter = MealAdapter(
+            filteredMealList, mealFavoriteDAO,
+            { id -> onItemSelected(id) },
+            { id, position -> onFavoriteSelected(id, position) }
+        )
+        binding.mealList.adapter = adapter
+        binding.mealList.layoutManager = GridLayoutManager(this, 1)
+        getMealList()
+        binding.textCategoryMeal.text = getString(R.string.meal_list_by_category, categoryName)
     }
 
-    fun getMeal(id: Int) {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.appbar_menu, menu)
+        val searchView = menu.findItem(R.id.action_search).actionView as SearchView
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                binding.textError.visibility = View.GONE
+                filteredMealList = originalMealList.filter { it.strMeal.contains(newText, true) }
+                adapter.updateItems(filteredMealList)
+                if (filteredMealList.isEmpty()) {
+                    showError(getString(R.string.error_no_results))
+                }
+                return true
+            }
+        })
+
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_settings -> {
+                val intent = Intent(this, SettingsActivity::class.java)
+                startActivity(intent)
+                true
+            }
+            R.id.action_favorites -> {
+                val intent = Intent(this, FavoritesActivity::class.java)
+                startActivity(intent)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun getMealList() {
+        binding.progressBar.isVisible = true
         lifecycleScope.launch {
             try {
-                val service = withContext(Dispatchers.IO) {
-                    MealService.getInstance()
+                withContext(Dispatchers.IO) {
+                    val service = MealService.getInstance()
+                    originalMealList = service.getMealsByCategory(categoryName).meals
+                    filteredMealList = originalMealList
                 }
-                meal = service.getMealById(id).meals[0]
-                CoroutineScope(Dispatchers.Main).launch {
-                    loadData()
-                }
+                adapter.updateItems(filteredMealList)
+                binding.progressBar.isVisible = false
             } catch (e: IOException) {
                 // Handles IO exceptions, like network errors
-                Log.e("DetailActivity", "Error fetching meal: ${e.message}")
+                Log.e("MealsCategoryActivity", "Error fetching meals: ${e.message}")
                 showError(getString(R.string.error_no_internet))
             } catch (e: Exception) {
                 // Handles other exceptions
-                Log.e("DetailActivity", "Error fetching meal: ${e.message}")
+                Log.e("MealsCategoryActivity", "Error fetching meals: ${e.message}")
                 showError(getString(R.string.error_generic))
             }
         }
     }
 
-    fun loadData() {
-        // Text info
-        binding.titleTextView.text = meal.strMeal
-        binding.categoryChip.text = getString(R.string.category_and_area, meal.strCategory, meal.strArea)
-        binding.textInstructions.text = meal.strInstructions
-        // Meal image
-        binding.mealImage.load(meal.strMealThumb)
-        // Recipe video
-        binding.youtubePlayerView.addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
-            override fun onReady(youTubePlayer: YouTubePlayer) {
-                meal.strYoutube?.let {
-                    if (it.isNotEmpty()) {
-                        val videoId = it.substringAfter("v=").substringBefore("&")
-                        youTubePlayer.cueVideo(videoId, 0f)
-                    } else {
-                        binding.youtubeFrame.visibility = View.GONE
-                    }
-                }
-            }
-        })
-        // Ingredients
-        val adapter = GalleryAdapter(meal.getIngredients())
-        binding.ingredientsRecyclerView.adapter = adapter
-        binding.ingredientsRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        // Share button
-        binding.shareButton.setOnClickListener {
-            val sendIntent = Intent()
-            sendIntent.setAction(Intent.ACTION_SEND)
-            sendIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_text, meal.strMeal, meal.idMeal.toString()))
-            sendIntent.setType("text/plain")
-            val shareIntent = Intent.createChooser(sendIntent, null)
-            startActivity(shareIntent)
-        }
-        // Favorite button
-        val isFavorite = mealFavoriteDAO.find(meal.idMeal) != null
-        binding.favoriteButton.setIconResource(if (isFavorite) R.drawable.ic_favorite else R.drawable.ic_favorite_outline)
-        binding.favoriteButton.setOnClickListener {
-            onFavoriteSelected(meal.idMeal)
-        }
+    fun onItemSelected(mealID: Int) {
+        val intent = Intent(this, DetailActivity::class.java)
+        intent.putExtra(DetailActivity.EXTRA_MEAL_ID, mealID)
+        startActivity(intent)
     }
 
-    fun onFavoriteSelected(mealID: Int) {
+    fun onFavoriteSelected(mealID: Int, position: Int) {
         val isFavorite = mealFavoriteDAO.find(mealID) != null
         if (!isFavorite) {
             lifecycleScope.launch {
@@ -130,7 +144,7 @@ class DetailActivity : AppCompatActivity() {
                     val mealData = withContext(Dispatchers.IO) {
                         MealService.getInstance().getMealById(mealID).meals[0]
                     }
-                    addMealToFavorites(mealData)
+                    addMealToFavorites(mealData, position)
                 } catch (e: IOException) {
                     Log.e("MealsCategoryActivity", "Error fetching meal details: ${e.message}")
                     showSnackbar(getString(R.string.error_no_internet_favorite))
@@ -141,11 +155,11 @@ class DetailActivity : AppCompatActivity() {
             }
         } else {
             mealFavoriteDAO.delete(mealID)
-            binding.favoriteButton.setIconResource(R.drawable.ic_favorite_outline)
+            adapter.notifyItemChanged(position)
         }
     }
 
-    fun addMealToFavorites(mealData: MealData) {
+    fun addMealToFavorites(mealData: MealData, position: Int) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val url = URL(mealData.strMealThumb)
@@ -153,7 +167,7 @@ class DetailActivity : AppCompatActivity() {
                 val mealFavorite = MealFavorite(mealData, thumbnail)
                 val result = mealFavoriteDAO.insert(mealFavorite)
                 withContext(Dispatchers.Main) {
-                    if (result != -1L) binding.favoriteButton.setIconResource(R.drawable.ic_favorite)
+                    if (result != -1L) adapter.notifyItemChanged(position)
                     else showSnackbar(getString(R.string.error_generic))
                 }
             } catch (e: IOException) {
@@ -175,9 +189,13 @@ class DetailActivity : AppCompatActivity() {
     }
 
     private fun showError(message: String) {
-        binding.scrollView.isVisible = false
-        binding.shareButton.isVisible = false
+        binding.progressBar.isVisible = false
         binding.textError.visibility = View.VISIBLE
         binding.textError.text = message
+    }
+
+    override fun onResume() {
+        super.onResume()
+        adapter.notifyDataSetChanged()
     }
 }
