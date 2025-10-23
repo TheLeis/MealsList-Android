@@ -1,6 +1,6 @@
 package com.ianleis.mealslist_android.ui.home
 
-import GalleryAdapter
+import com.ianleis.mealslist_android.ui.gallery.GalleryAdapter
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log

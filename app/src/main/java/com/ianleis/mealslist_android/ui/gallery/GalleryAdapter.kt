@@ -1,9 +1,10 @@
+package com.ianleis.mealslist_android.ui.gallery
+
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.ianleis.mealslist_android.data.network.Ingredient
 import com.ianleis.mealslist_android.databinding.ItemGalleryBinding
-import com.ianleis.mealslist_android.ui.gallery.GalleryViewHolder
 
 class GalleryAdapter(
     var items: List<Ingredient>,
