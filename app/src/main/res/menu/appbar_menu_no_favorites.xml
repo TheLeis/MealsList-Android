@@ -13,7 +13,7 @@
     <item
         android:id="@+id/action_settings"
         android:icon="@drawable/ic_settings"
-        android:title="@string/menu_search"
+        android:title="@string/menu_settings"
         app:showAsAction="ifRoom|collapseActionView"
         app:iconTint="@color/button_tint"/>
 </menu>
