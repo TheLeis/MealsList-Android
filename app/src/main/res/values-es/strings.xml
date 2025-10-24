@@ -18,4 +18,9 @@
     <string name="instructions">Instrucciones</string>
     <string name="share">Compartir</string>
     <string name="share_text">Mira ésta receta de %1$s: https://www.themealdb.com/meal/%2$s</string>
+    <string name="language">Idioma</string>
+    <string-array name="languages">
+        <item>Inglés</item>
+        <item>Español</item>
+    </string-array>
 </resources>

@@ -32,7 +32,7 @@
             <FrameLayout
                 android:id="@+id/youtubeFrame"
                 android:layout_width="match_parent"
-                android:layout_height="240dp">
+                android:layout_height="wrap_content">
 
                 <com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
                     android:id="@+id/youtubePlayerView"

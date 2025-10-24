@@ -1,5 +1,6 @@
 package com.ianleis.mealslist_android.domain.model
 
 data class SettingsModel(
-    var darkMode:Boolean
+    var darkMode:Boolean,
+    var language: String? = null
 )
