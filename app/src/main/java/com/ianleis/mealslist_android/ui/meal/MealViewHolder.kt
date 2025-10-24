@@ -19,8 +19,14 @@ class MealViewHolder (
             crossfade(true)
         }
         val isFavorite = mealFavoriteDAO.find(meal.idMeal) != null
-        val favoriteIcon = if (isFavorite) { R.drawable.ic_favorite }
-        else { R.drawable.ic_favorite_outline }
-        binding.favoriteButton.setIconResource(favoriteIcon)
+        if (!isFavorite) {
+            binding.favoriteButton.setIconResource(R.drawable.ic_favorite_outline)
+            binding.favoriteButton.contentDescription = binding.root.context.getString(R.string.mark_meal_as_favorite, meal.strMeal)
+        }
+        else {
+            binding.favoriteButton.setIconResource(R.drawable.ic_favorite)
+            binding.favoriteButton.contentDescription = binding.root.context.getString(R.string.remove_meal_from_favorite, meal.strMeal)
+
+        }
     }
 }

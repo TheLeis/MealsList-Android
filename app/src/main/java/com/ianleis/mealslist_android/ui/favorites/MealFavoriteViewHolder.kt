@@ -15,5 +15,6 @@ class MealFavoriteViewHolder (val binding: ItemMealBinding) : RecyclerView.ViewH
             crossfade(true)
         }
         binding.favoriteButton.setIconResource(R.drawable.ic_favorite)
+        binding.favoriteButton.contentDescription = binding.root.context.getString(R.string.remove_meal_from_favorite, meal.strMeal)
     }
 }

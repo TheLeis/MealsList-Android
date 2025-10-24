@@ -5,6 +5,9 @@
     <string name="menu_favorites">Favoritos</string>
     <string name="menu_settings">Ajustes</string>
     <string name="dark_mode">Modo oscuro</string>
+    <string name="info_about_category">Información sobre %1$s</string>
+    <string name="mark_meal_as_favorite">Marcar %1$s como favorito</string>
+    <string name="remove_meal_from_favorite">Eliminar %1$s de favoritos</string>
     <string name="category_list">Lista de categorías</string>
     <string name="meal_list_by_category">Lista de platos %1$s</string>
     <string name="meal_list_favorites">Lista de platos favoritos</string>

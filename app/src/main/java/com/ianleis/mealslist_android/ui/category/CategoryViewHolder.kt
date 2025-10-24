@@ -6,6 +6,7 @@ import com.ianleis.mealslist_android.data.network.Category
 import com.ianleis.mealslist_android.databinding.ItemCategoryBinding
 import coil3.load
 import coil3.request.crossfade
+import com.ianleis.mealslist_android.R
 
 class CategoryViewHolder(val binding: ItemCategoryBinding) : RecyclerView.ViewHolder(binding.root) {
 
@@ -15,6 +16,7 @@ class CategoryViewHolder(val binding: ItemCategoryBinding) : RecyclerView.ViewHo
             crossfade(true)
         }
         binding.infoButton.setOnClickListener { showInfo(category.strCategory, category.strCategoryDescription) }
+        binding.infoButton.contentDescription = binding.root.context.getString(R.string.info_about_category, category.strCategory)
     }
 
     fun showInfo(title: String, description: String) {
