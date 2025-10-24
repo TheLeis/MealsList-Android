@@ -11,7 +11,7 @@ Una sencilla aplicación para Android que muestra una lista de recetas de cocina
 
 ## Dependencias utilizadas
 
-*   **Retrofit**: Para realizar peticiones a la API de TheMealDB.
+*   **Retrofit**: Para realizar peticiones a la API de [TheMealDB](https://www.themealdb.com/).
 *   **Coil**: Para la carga de imágenes.
 *   **SQLite**: Para almacenar las recetas favoritas en una base de datos local.
 *   **[Youtube Player](https://github.com/PierfrancescoSoffritti/android-youtube-player)**: Para reproducir videos de YouTube.
