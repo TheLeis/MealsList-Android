@@ -22,7 +22,6 @@ import com.ianleis.mealslist_android.data.network.Category
 import com.ianleis.mealslist_android.data.network.MealService
 import com.ianleis.mealslist_android.databinding.ActivityMainBinding
 import com.ianleis.mealslist_android.ui.category.CategoryAdapter
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -60,6 +59,7 @@ class MainActivity : AppCompatActivity() {
             { category -> onItemSelected(category) }
         binding.categoryList.adapter = adapter
         binding.categoryList.layoutManager = GridLayoutManager(this, 1)
+        binding.swipeRefreshLayout.setOnRefreshListener { getCategoryList() }
         getCategoryList()
     }
 
@@ -67,17 +67,13 @@ class MainActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.appbar_menu, menu)
         val searchView = menu.findItem(R.id.action_search).actionView as SearchView
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String): Boolean {
-                return false
-            }
+            override fun onQueryTextSubmit(query: String): Boolean { return false }
 
             override fun onQueryTextChange(newText: String): Boolean {
                 binding.textError.visibility = View.GONE
                 filteredCategoryList = originalCategoryList.filter { it.strCategory.contains(newText, true) }
                 adapter.updateItems(filteredCategoryList)
-                if (filteredCategoryList.isEmpty()) {
-                    showError(getString(R.string.error_no_results))
-                }
+                if (filteredCategoryList.isEmpty()) showError(getString(R.string.error_no_results))
                 return true
             }
         })
@@ -107,33 +103,40 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    fun getCategoryList() {
-        binding.progressBar.isVisible = true
-        lifecycleScope.launch {
+    private fun getCategoryList() {
+        binding.textError.visibility = View.GONE
+        if (!binding.swipeRefreshLayout.isRefreshing) binding.progressBar.isVisible = true
+        lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val service = withContext(Dispatchers.IO) {
-                    MealService.getInstance()
-                }
-                originalCategoryList = service.getAllCategories().categories
-                filteredCategoryList = originalCategoryList
-                CoroutineScope(Dispatchers.Main).launch {
+                val service = MealService.getInstance()
+                val categories = service.getAllCategories().categories
+                originalCategoryList = categories
+                filteredCategoryList = categories
+                withContext(Dispatchers.Main) {
                     adapter.updateItems(filteredCategoryList)
+                    binding.categoryList.visibility = View.VISIBLE
                 }
-                binding.progressBar.isVisible = false
             } catch (e: IOException) {
                 // Handles IO exceptions, like network errors
                 Log.e("MainActivity", "Error fetching categories: ${e.message}")
-                showError(getString(R.string.error_no_internet))
+                withContext(Dispatchers.Main) { showError(getString(R.string.error_no_internet)) }
             } catch (e: Exception) {
                 // Handles other exceptions
                 Log.e("MainActivity", "Error fetching categories: ${e.message}")
-                showError(getString(R.string.error_generic))
+                withContext(Dispatchers.Main) { showError(getString(R.string.error_generic)) }
+            } finally {
+                withContext(Dispatchers.Main) {
+                    binding.progressBar.isVisible = false
+                    binding.swipeRefreshLayout.isRefreshing = false
+                }
             }
         }
     }
 
     private fun showError(message: String) {
         binding.progressBar.isVisible = false
+        binding.categoryList.visibility = View.GONE
+        binding.swipeRefreshLayout.isRefreshing = false
         binding.textError.visibility = View.VISIBLE
         binding.textError.text = message
     }

@@ -65,6 +65,9 @@ class MealsListActivity : AppCompatActivity() {
         )
         binding.mealList.adapter = adapter
         binding.mealList.layoutManager = GridLayoutManager(this, 1)
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            getMealList()
+        }
         getMealList()
         binding.textCategoryMeal.text = getString(R.string.meal_list_by_category, categoryName)
     }
@@ -73,21 +76,16 @@ class MealsListActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.appbar_menu, menu)
         val searchView = menu.findItem(R.id.action_search).actionView as SearchView
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String): Boolean {
-                return false
-            }
+            override fun onQueryTextSubmit(query: String): Boolean { return false }
 
             override fun onQueryTextChange(newText: String): Boolean {
                 binding.textError.visibility = View.GONE
                 filteredMealList = originalMealList.filter { it.strMeal.contains(newText, true) }
                 adapter.updateItems(filteredMealList)
-                if (filteredMealList.isEmpty()) {
-                    showError(getString(R.string.error_no_results))
-                }
+                if (filteredMealList.isEmpty()) showError(getString(R.string.error_no_results))
                 return true
             }
         })
-
         return true
     }
 
@@ -108,24 +106,34 @@ class MealsListActivity : AppCompatActivity() {
     }
 
     private fun getMealList() {
-        binding.progressBar.isVisible = true
-        lifecycleScope.launch {
+        binding.textError.visibility = View.GONE
+        if (!binding.swipeRefreshLayout.isRefreshing) {
+            binding.progressBar.isVisible = true
+        }
+
+        lifecycleScope.launch(Dispatchers.IO) {
             try {
-                withContext(Dispatchers.IO) {
-                    val service = MealService.getInstance()
-                    originalMealList = service.getMealsByCategory(categoryName).meals
-                    filteredMealList = originalMealList
+                val service = MealService.getInstance()
+                val meals = service.getMealsByCategory(categoryName).meals
+                originalMealList = meals
+                filteredMealList = meals
+                withContext(Dispatchers.Main) {
+                    adapter.updateItems(filteredMealList)
+                    binding.mealList.visibility = View.VISIBLE
                 }
-                adapter.updateItems(filteredMealList)
-                binding.progressBar.isVisible = false
             } catch (e: IOException) {
                 // Handles IO exceptions, like network errors
                 Log.e("MealsCategoryActivity", "Error fetching meals: ${e.message}")
-                showError(getString(R.string.error_no_internet))
+                withContext(Dispatchers.Main) { showError(getString(R.string.error_no_internet)) }
             } catch (e: Exception) {
                 // Handles other exceptions
                 Log.e("MealsCategoryActivity", "Error fetching meals: ${e.message}")
-                showError(getString(R.string.error_generic))
+                withContext(Dispatchers.Main) { showError(getString(R.string.error_generic)) }
+            } finally {
+                withContext(Dispatchers.Main) {
+                    binding.progressBar.isVisible = false
+                    binding.swipeRefreshLayout.isRefreshing = false
+                }
             }
         }
     }
@@ -141,9 +149,7 @@ class MealsListActivity : AppCompatActivity() {
         if (!isFavorite) {
             lifecycleScope.launch {
                 try {
-                    val mealData = withContext(Dispatchers.IO) {
-                        MealService.getInstance().getMealById(mealID).meals[0]
-                    }
+                    val mealData = withContext(Dispatchers.IO) { MealService.getInstance().getMealById(mealID).meals[0] }
                     addMealToFavorites(mealData, position)
                 } catch (e: IOException) {
                     Log.e("MealsCategoryActivity", "Error fetching meal details: ${e.message}")
@@ -190,6 +196,8 @@ class MealsListActivity : AppCompatActivity() {
 
     private fun showError(message: String) {
         binding.progressBar.isVisible = false
+        binding.mealList.visibility = View.GONE
+        binding.swipeRefreshLayout.isRefreshing = false
         binding.textError.visibility = View.VISIBLE
         binding.textError.text = message
     }
