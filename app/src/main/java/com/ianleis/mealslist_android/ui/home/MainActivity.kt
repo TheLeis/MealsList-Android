@@ -44,10 +44,12 @@ class MainActivity : AppCompatActivity() {
         // Set app to dark mode if the user has selected it in the settings
         lifecycleScope.launch {
             val isDarkMode = dataStore.data.map { preferences ->
-                preferences[SettingsKeys.DARK_MODE_KEY] ?: false
+                preferences[SettingsKeys.DARK_MODE_KEY]
             }.first()
-            if (isDarkMode) AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            else AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            if (isDarkMode != null) {
+                if (isDarkMode) AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                else AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            } else { AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM) }
             delegate.applyDayNight()
         }
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
