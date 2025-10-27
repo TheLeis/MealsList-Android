@@ -35,6 +35,7 @@ class FavoritesActivity : AppCompatActivity() {
         enableEdgeToEdge()
         binding = ActivityMealsListBinding.inflate(layoutInflater)
         setContentView(binding.main)
+        setSupportActionBar(binding.toolbar)
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)

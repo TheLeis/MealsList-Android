@@ -41,6 +41,7 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.main)
+        setSupportActionBar(binding.toolbar)
         // Set app to dark mode if the user has selected it in the settings
         lifecycleScope.launch {
             val isDarkMode = dataStore.data.map { preferences ->
