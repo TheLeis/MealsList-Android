@@ -10,8 +10,14 @@ interface MealService {
     @GET("categories.php")
     suspend fun getAllCategories(): Categories
 
+    @GET("list.php?a=list")
+    suspend fun getAllAreas(): Areas
+
     @GET("filter.php")
     suspend fun getMealsByCategory(@Query("c") category: String): Meals
+
+    @GET("filter.php")
+    suspend fun getMealsByArea(@Query("a") area: String): Meals
 
     @GET("lookup.php")
     suspend fun getMealById(@Query("i") id: Int): MealDescription

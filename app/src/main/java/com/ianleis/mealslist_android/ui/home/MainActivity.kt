@@ -18,9 +18,11 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.ianleis.mealslist_android.R
 import com.ianleis.mealslist_android.data.SettingsKeys
 import com.ianleis.mealslist_android.data.dataStore
+import com.ianleis.mealslist_android.data.network.Area
 import com.ianleis.mealslist_android.data.network.Category
 import com.ianleis.mealslist_android.data.network.MealService
 import com.ianleis.mealslist_android.databinding.ActivityMainBinding
+import com.ianleis.mealslist_android.ui.area.AreaAdapter
 import com.ianleis.mealslist_android.ui.category.CategoryAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -32,9 +34,18 @@ import java.io.IOException
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var adapter : CategoryAdapter
+    private lateinit var categoryAdapter : CategoryAdapter
+    private lateinit var areaAdapter : AreaAdapter
     private var filteredCategoryList: List<Category> = emptyList()
     private var originalCategoryList: List<Category> = emptyList()
+    private var filteredAreaList: List<Area> = emptyList()
+    private var originalAreaList: List<Area> = emptyList()
+
+    private enum class FilterType {
+        CATEGORY, AREA
+    }
+
+    private var currentFilter: FilterType = FilterType.CATEGORY
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,25 +69,44 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        adapter = CategoryAdapter(originalCategoryList)
-            { category -> onItemSelected(category) }
-        binding.categoryList.adapter = adapter
-        binding.categoryList.layoutManager = GridLayoutManager(this, 1)
-        binding.swipeRefreshLayout.setOnRefreshListener { getCategoryList() }
+        categoryAdapter = CategoryAdapter(originalCategoryList)
+            { category -> onCategorySelected(category) }
+        areaAdapter = AreaAdapter(originalAreaList)
+        { area -> onAreaSelected(area) }
+        binding.recyclerView.adapter = categoryAdapter
+        binding.recyclerView.layoutManager = GridLayoutManager(this, 1)
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            when (currentFilter) {
+                FilterType.CATEGORY -> getCategoryList()
+                FilterType.AREA -> getAreaList()
+            }
+        }
         getCategoryList()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.appbar_menu, menu)
+        menuInflater.inflate(R.menu.appbar_menu_main, menu)
         val searchView = menu.findItem(R.id.action_search).actionView as SearchView
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean { return false }
 
             override fun onQueryTextChange(newText: String): Boolean {
                 binding.textError.visibility = View.GONE
-                filteredCategoryList = originalCategoryList.filter { it.strCategory.contains(newText, true) }
-                adapter.updateItems(filteredCategoryList)
-                if (filteredCategoryList.isEmpty()) showError(getString(R.string.error_no_results))
+                when (currentFilter) {
+                    FilterType.CATEGORY -> {
+                        filteredCategoryList =
+                            originalCategoryList.filter { it.strCategory.contains(newText, true) }
+                        categoryAdapter.updateItems(filteredCategoryList)
+                        if (filteredCategoryList.isEmpty()) showError(getString(R.string.error_no_results))
+                    }
+
+                    FilterType.AREA -> {
+                        filteredAreaList =
+                            originalAreaList.filter { it.strArea.contains(newText, true) }
+                        areaAdapter.updateItems(filteredAreaList)
+                        if (filteredAreaList.isEmpty()) showError(getString(R.string.error_no_results))
+                    }
+                }
                 return true
             }
         })
@@ -96,13 +126,33 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
                 true
             }
+            R.id.action_filter_by_category -> {
+                currentFilter = FilterType.CATEGORY
+                binding.textList.text = getString(R.string.category_list)
+                binding.recyclerView.adapter = categoryAdapter
+                getCategoryList()
+                true
+            }
+            R.id.action_filter_by_area -> {
+                currentFilter = FilterType.AREA
+                binding.textList.text = getString(R.string.area_list)
+                binding.recyclerView.adapter = areaAdapter
+                getAreaList()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
 
-    fun onItemSelected(categoryName: String) {
+    fun onCategorySelected(categoryName: String) {
         val intent = Intent(this, MealsListActivity::class.java)
         intent.putExtra(MealsListActivity.EXTRA_CATEGORY_NAME, categoryName)
+        startActivity(intent)
+    }
+
+    fun onAreaSelected(areaName: String) {
+        val intent = Intent(this, MealsListActivity::class.java)
+        intent.putExtra(MealsListActivity.EXTRA_AREA_NAME, areaName)
         startActivity(intent)
     }
 
@@ -116,8 +166,8 @@ class MainActivity : AppCompatActivity() {
                 originalCategoryList = categories
                 filteredCategoryList = categories
                 withContext(Dispatchers.Main) {
-                    adapter.updateItems(filteredCategoryList)
-                    binding.categoryList.visibility = View.VISIBLE
+                    categoryAdapter.updateItems(filteredCategoryList)
+                    binding.recyclerView.visibility = View.VISIBLE
                 }
             } catch (e: IOException) {
                 // Handles IO exceptions, like network errors
@@ -126,6 +176,34 @@ class MainActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 // Handles other exceptions
                 Log.e("MainActivity", "Error fetching categories: ${e.message}")
+                withContext(Dispatchers.Main) { showError(getString(R.string.error_generic)) }
+            } finally {
+                withContext(Dispatchers.Main) {
+                    binding.progressBar.isVisible = false
+                    binding.swipeRefreshLayout.isRefreshing = false
+                }
+            }
+        }
+    }
+
+    private fun getAreaList() {
+        binding.textError.visibility = View.GONE
+        if (!binding.swipeRefreshLayout.isRefreshing) binding.progressBar.isVisible = true
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val service = MealService.getInstance()
+                val areas = service.getAllAreas().meals
+                originalAreaList = areas
+                filteredAreaList = areas
+                withContext(Dispatchers.Main) {
+                    areaAdapter.updateItems(filteredAreaList)
+                    binding.recyclerView.visibility = View.VISIBLE
+                }
+            } catch (e: IOException) {
+                Log.e("MainActivity", "Error fetching areas: ${e.message}")
+                withContext(Dispatchers.Main) { showError(getString(R.string.error_no_internet)) }
+            } catch (e: Exception) {
+                Log.e("MainActivity", "Error fetching areas: ${e.message}")
                 withContext(Dispatchers.Main) { showError(getString(R.string.error_generic)) }
             } finally {
                 withContext(Dispatchers.Main) {

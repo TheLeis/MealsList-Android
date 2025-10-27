@@ -4,12 +4,15 @@
     <string name="menu_search">Buscar</string>
     <string name="menu_favorites">Favoritos</string>
     <string name="menu_settings">Ajustes</string>
+    <string name="menu_filter_by">Filtrar por</string>
+    <string name="menu_area">Área</string>
     <string name="dark_mode">Modo oscuro</string>
+    <string name="area_list">Lista de áreas</string>
     <string name="info_about_category">Información sobre %1$s</string>
     <string name="mark_meal_as_favorite">Marcar %1$s como favorito</string>
     <string name="remove_meal_from_favorite">Eliminar %1$s de favoritos</string>
     <string name="category_list">Lista de categorías</string>
-    <string name="meal_list_by_category">Lista de platos %1$s</string>
+    <string name="meal_list_by">Lista de platos %1$s</string>
     <string name="meal_list_favorites">Lista de platos favoritos</string>
     <string name="meal_removed_from_favorites">%1$s eliminado de favoritos.</string>
     <string name="error_no_results">No se encontraron resultados.</string>
@@ -26,4 +29,5 @@
         <item>Inglés</item>
         <item>Español</item>
     </string-array>
+    <string name="menu_category">Categoría</string>
 </resources>

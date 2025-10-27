@@ -34,6 +34,7 @@ class MealsListActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_CATEGORY_NAME = "CATEGORY_NAME"
+        const val EXTRA_AREA_NAME = "AREA_NAME"
     }
 
     private lateinit var binding: ActivityMealsListBinding
@@ -41,6 +42,7 @@ class MealsListActivity : AppCompatActivity() {
     private var filteredMealList: List<MealItem> = emptyList()
     private var originalMealList: List<MealItem> = emptyList()
     private lateinit var categoryName : String
+    private lateinit var areaName : String
     private lateinit var mealFavoriteDAO: MealFavoriteDAO
     private var bottomInset: Int = 0
 
@@ -58,7 +60,9 @@ class MealsListActivity : AppCompatActivity() {
             insets
         }
         mealFavoriteDAO = MealFavoriteDAO(this)
-        categoryName = intent.getStringExtra(EXTRA_CATEGORY_NAME)!!
+        categoryName = intent.getStringExtra(EXTRA_CATEGORY_NAME).orEmpty()
+        areaName = intent.getStringExtra(EXTRA_AREA_NAME).orEmpty()
+        Log.i("MealsListActivity", "Category: $categoryName, Area: $areaName")
         adapter = MealAdapter(
             filteredMealList, mealFavoriteDAO,
             { id -> onItemSelected(id) },
@@ -66,15 +70,14 @@ class MealsListActivity : AppCompatActivity() {
         )
         binding.mealList.adapter = adapter
         binding.mealList.layoutManager = GridLayoutManager(this, 1)
-        binding.swipeRefreshLayout.setOnRefreshListener {
-            getMealList()
-        }
+        binding.swipeRefreshLayout.setOnRefreshListener { getMealList() }
         getMealList()
-        binding.textCategoryMeal.text = getString(R.string.meal_list_by_category, categoryName)
+        if (categoryName.isNotEmpty()) binding.textCategoryMeal.text = getString(R.string.meal_list_by, categoryName)
+        else binding.textCategoryMeal.text = getString(R.string.meal_list_by, areaName)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.appbar_menu, menu)
+        menuInflater.inflate(R.menu.appbar_menu_meals, menu)
         val searchView = menu.findItem(R.id.action_search).actionView as SearchView
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean { return false }
@@ -115,7 +118,9 @@ class MealsListActivity : AppCompatActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val service = MealService.getInstance()
-                val meals = service.getMealsByCategory(categoryName).meals
+                val meals = if (categoryName.isNotEmpty()) service.getMealsByCategory(categoryName).meals
+                else if (areaName.isNotEmpty()) service.getMealsByArea(areaName).meals
+                else emptyList()
                 originalMealList = meals
                 filteredMealList = meals
                 withContext(Dispatchers.Main) {
@@ -124,11 +129,11 @@ class MealsListActivity : AppCompatActivity() {
                 }
             } catch (e: IOException) {
                 // Handles IO exceptions, like network errors
-                Log.e("MealsCategoryActivity", "Error fetching meals: ${e.message}")
+                Log.e("MealsListActivity", "Error fetching meals: ${e.message}")
                 withContext(Dispatchers.Main) { showError(getString(R.string.error_no_internet)) }
             } catch (e: Exception) {
                 // Handles other exceptions
-                Log.e("MealsCategoryActivity", "Error fetching meals: ${e.message}")
+                Log.e("MealsListActivity", "Error fetching meals: ${e.message}")
                 withContext(Dispatchers.Main) { showError(getString(R.string.error_generic)) }
             } finally {
                 withContext(Dispatchers.Main) {
@@ -153,10 +158,10 @@ class MealsListActivity : AppCompatActivity() {
                     val mealData = withContext(Dispatchers.IO) { MealService.getInstance().getMealById(mealID).meals[0] }
                     addMealToFavorites(mealData, position)
                 } catch (e: IOException) {
-                    Log.e("MealsCategoryActivity", "Error fetching meal details: ${e.message}")
+                    Log.e("MealsListActivity", "Error fetching meal details: ${e.message}")
                     showSnackbar(getString(R.string.error_no_internet_favorite))
                 } catch (e: Exception) {
-                    Log.e("MealsCategoryActivity", "Error fetching meal details: ${e.message}")
+                    Log.e("MealsListActivity", "Error fetching meal details: ${e.message}")
                     showSnackbar(getString(R.string.error_generic))
                 }
             }
@@ -178,10 +183,10 @@ class MealsListActivity : AppCompatActivity() {
                     else showSnackbar(getString(R.string.error_generic))
                 }
             } catch (e: IOException) {
-                Log.e("MealsCategoryActivity", "Error fetching meal details: ${e.message}")
+                Log.e("MealsListActivity", "Error fetching meal details: ${e.message}")
                 showSnackbar(getString(R.string.error_no_internet_favorite))
             } catch (e: Exception) {
-                Log.e("MealsCategoryActivity", "Error saving favorite: ${e.message}")
+                Log.e("MealsListActivity", "Error saving favorite: ${e.message}")
                 withContext(Dispatchers.Main) { showSnackbar(getString(R.string.error_generic)) }
             }
         }
