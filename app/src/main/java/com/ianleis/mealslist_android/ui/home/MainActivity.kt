@@ -138,7 +138,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun showError(message: String) {
         binding.progressBar.isVisible = false
-        binding.categoryList.visibility = View.GONE
         binding.swipeRefreshLayout.isRefreshing = false
         binding.textError.visibility = View.VISIBLE
         binding.textError.text = message

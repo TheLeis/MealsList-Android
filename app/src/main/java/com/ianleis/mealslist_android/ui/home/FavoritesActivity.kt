@@ -69,9 +69,7 @@ class FavoritesActivity : AppCompatActivity() {
                 binding.textError.visibility = View.GONE
                 filteredMealList = originalMealList.filter { it.strMeal.contains(newText, true) }
                 adapter.updateItems(filteredMealList)
-                if (filteredMealList.isEmpty()) {
-                    showError(getString(R.string.error_no_results))
-                }
+                if (filteredMealList.isEmpty()) showError(getString(R.string.error_no_results))
                 return true
             }
         })
