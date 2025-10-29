@@ -202,6 +202,7 @@ class MealsListActivity : AppCompatActivity() {
 
     private fun showError(message: String) {
         binding.progressBar.isVisible = false
+        binding.mealList.isVisible = false
         binding.swipeRefreshLayout.isRefreshing = false
         binding.textError.visibility = View.VISIBLE
         binding.textError.text = message
