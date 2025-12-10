@@ -98,6 +98,7 @@ class MainActivity : AppCompatActivity() {
                             originalCategoryList.filter { it.strCategory.contains(newText, true) }
                         categoryAdapter.updateItems(filteredCategoryList)
                         if (filteredCategoryList.isEmpty()) showError(getString(R.string.error_no_results))
+                        else binding.recyclerView.isVisible = true
                     }
 
                     FilterType.AREA -> {
@@ -105,6 +106,7 @@ class MainActivity : AppCompatActivity() {
                             originalAreaList.filter { it.strArea.contains(newText, true) }
                         areaAdapter.updateItems(filteredAreaList)
                         if (filteredAreaList.isEmpty()) showError(getString(R.string.error_no_results))
+                        else binding.recyclerView.isVisible = true
                     }
                 }
                 return true

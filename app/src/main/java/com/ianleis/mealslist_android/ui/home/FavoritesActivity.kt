@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.ianleis.mealslist_android.R
@@ -52,9 +53,9 @@ class FavoritesActivity : AppCompatActivity() {
         binding.mealList.layoutManager = GridLayoutManager(this, 1)
         binding.textCategoryMeal.text = getString(R.string.meal_list_favorites)
         getMealList()
-        if (filteredMealList.isEmpty()) {
-            showError(getString(R.string.error_no_results))
-        }
+        if (filteredMealList.isEmpty()) showError(getString(R.string.error_no_results))
+        else binding.mealList.isVisible = true
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

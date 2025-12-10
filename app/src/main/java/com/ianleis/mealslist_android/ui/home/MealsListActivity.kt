@@ -87,6 +87,7 @@ class MealsListActivity : AppCompatActivity() {
                 filteredMealList = originalMealList.filter { it.strMeal.contains(newText, true) }
                 adapter.updateItems(filteredMealList)
                 if (filteredMealList.isEmpty()) showError(getString(R.string.error_no_results))
+                else binding.mealList.isVisible = true
                 return true
             }
         })
